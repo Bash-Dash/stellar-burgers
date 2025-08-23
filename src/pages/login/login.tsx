@@ -9,6 +9,7 @@ import {
   selectUserError
 } from '../../services/slices/userSlice';
 import { Preloader } from '../../components/ui/preloader';
+import { getCookie } from '../../utils/cookie';
 
 export const Login: FC = () => {
   const [email, setEmail] = useState('');
@@ -31,18 +32,19 @@ export const Login: FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!email || !password) return;
 
     try {
       const result = await dispatch(loginUser({ email, password })).unwrap();
-      console.log('Login successful:', result);
+      const token = getCookie('accessToken');
 
-      const from = location.state?.from || '/';
-      navigate(from, { replace: true });
-    } catch (err) {
-      console.error('Login failed:', err);
-    }
+      if (!token) {
+        return;
+      }
+      if (result) {
+        navigate('/');
+      }
+    } catch (err) {}
   };
 
   if (loading) {

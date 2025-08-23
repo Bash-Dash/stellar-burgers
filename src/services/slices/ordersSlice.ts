@@ -57,6 +57,9 @@ const ordersSlice = createSlice({
     },
     resetOrdersState() {
       return initialState;
+    },
+    clearOrderModal: (state) => {
+      state.orderModalData = null;
     }
   },
   extraReducers: (builder) => {
@@ -95,21 +98,21 @@ const ordersSlice = createSlice({
 });
 
 export const selectCurrentOrder = (state: RootState) =>
-  state.orders.currentOrder;
+  state.order.currentOrder;
 
-export const selectOrdersList = (state: RootState) => state.orders.ordersList;
+export const selectOrdersList = (state: RootState) => state.order.ordersList;
 
-export const selectOrderLoading = (state: RootState) => state.orders.isLoading;
+export const selectOrderLoading = (state: RootState) => state.order.isLoading;
 
-export const selectOrderError = (state: RootState) => state.orders.error;
+export const selectOrderError = (state: RootState) => state.order.error;
 
 export const selectOrderRequest = (state: RootState) =>
-  state.orders.orderRequest;
+  state.order.orderRequest;
 
 export const selectOrderModalData = (state: RootState) =>
-  state.orders.orderModalData;
+  state.order.orderModalData;
 
-export const { clearCurrentOrder, clearOrder, resetOrdersState } =
+export const { clearCurrentOrder, clearOrderModal, resetOrdersState } =
   ordersSlice.actions;
 
 export default ordersSlice.reducer;

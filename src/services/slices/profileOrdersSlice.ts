@@ -54,19 +54,8 @@ const profileOrdersSlice = createSlice({
         state.error = (action.payload as { message: string }).message;
         state.orders = [];
       });
-  },
-  selectors: {
-    selectProfileOrders: (state) => state.orders,
-    selectProfileOrdersLoading: (state) => state.isLoading,
-    selectProfileOrdersError: (state) => state.error
   }
 });
 
 export const { clearOrders } = profileOrdersSlice.actions;
-export const {
-  selectProfileOrders,
-  selectProfileOrdersLoading,
-  selectProfileOrdersError
-} = profileOrdersSlice.selectors;
-
 export default profileOrdersSlice.reducer;

@@ -6,19 +6,20 @@ import {
   useSelector as selectorHook
 } from 'react-redux';
 import { combineReducers } from 'redux';
+
 import ingredientsReducer from './slices/ingredientsSlice';
+import constructorReducer from './slices/constructorSlice';
 import ordersReducer from './slices/ordersSlice';
 import userReducer from './slices/userSlice';
-import constructorReducer from './slices/constructorSlice';
 import feedReducer from './slices/feedSlice';
 import profileOrdersReducer from './slices/profileOrdersSlice';
 
 const rootReducer = combineReducers({
-  ingredients: ingredientsReducer,
-  orders: ordersReducer,
   user: userReducer,
-  burgerConstructor: constructorReducer,
+  ingredients: ingredientsReducer,
+  burgers: constructorReducer,
   feed: feedReducer,
+  order: ordersReducer,
   profileOrders: profileOrdersReducer
 });
 
@@ -28,7 +29,6 @@ const store = configureStore({
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
-
 export type AppDispatch = typeof store.dispatch;
 
 export const useDispatch: () => AppDispatch = () => dispatchHook();

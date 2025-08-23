@@ -3,15 +3,15 @@ import { useSelector } from '../../services/store';
 import { IngredientsCategoryUI } from '../ui/ingredients-category';
 import type { TIngredientsCategoryProps } from './type';
 import type { TIngredient } from '@utils-types';
-import { selectConstructor } from '../../services/slices/constructorSlice';
 
 export const IngredientsCategory = forwardRef<
   HTMLUListElement,
   TIngredientsCategoryProps
 >(({ title, titleRef, ingredients }, ref) => {
-  const { bun, ingredients: constructorIngredients } =
-    useSelector(selectConstructor);
-
+  const bun = useSelector((state) => state.burgers.bun);
+  const constructorIngredients = useSelector(
+    (state) => state.burgers.ingredients
+  );
   const ingredientsCounters = useMemo(() => {
     const counters: Record<string, number> = {};
 

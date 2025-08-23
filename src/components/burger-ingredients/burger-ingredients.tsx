@@ -9,9 +9,10 @@ export const BurgerIngredients: FC = memo(() => {
   const ingredients = useSelector((state) => state.ingredients.ingredients);
   const isLoading = useSelector((state) => state.ingredients.isLoading);
   const error = useSelector((state) => state.ingredients.error);
-  const bun = useSelector((state) => state.burgerConstructor.bun);
+
+  const bun = useSelector((state) => state.burgers.bun);
   const constructorIngredients = useSelector(
-    (state) => state.burgerConstructor.ingredients
+    (state) => state.burgers.ingredients
   );
   const [currentTab, setCurrentTab] = useState<TTabMode>('bun');
   const bunTitleRef = useRef<HTMLHeadingElement>(null);

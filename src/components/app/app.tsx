@@ -14,7 +14,6 @@ import {
 } from '@pages';
 import { AppHeader, Modal, IngredientDetails, OrderInfo } from '@components';
 import { fetchIngredients } from '../../services/slices/ingredientsSlice';
-import { getCookie } from '../../utils/cookie';
 import { checkUserAuth } from '../../services/slices/userSlice';
 import styles from './app.module.css';
 import { ProtectedRoute } from '../protected-route';
@@ -29,10 +28,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(fetchIngredients());
-    const token = getCookie('accessToken');
-    if (token) {
-      dispatch(checkUserAuth());
-    }
+    dispatch(checkUserAuth());
   }, [dispatch]);
 
   return (
@@ -127,11 +123,9 @@ const App = () => {
           <Route
             path='/profile/orders/:number'
             element={
-              <ProtectedRoute>
-                <Modal title='Детали заказа' onClose={handleModalClose}>
-                  <OrderInfo />
-                </Modal>
-              </ProtectedRoute>
+              <Modal title='Детали заказа' onClose={handleModalClose}>
+                <OrderInfo />
+              </Modal>
             }
           />
         </Routes>

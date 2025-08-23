@@ -1,4 +1,4 @@
-import { setCookie, getCookie } from './cookie';
+import { setCookie, getCookie, deleteCookie } from './cookie';
 import { TIngredient, TOrder, TOrdersData, TUser } from './types';
 
 //const URL = process.env.BURGER_API_URL;
@@ -39,21 +39,33 @@ export const refreshToken = (): Promise<TRefreshResponse> =>
 export const fetchWithRefresh = async <T>(
   url: RequestInfo,
   options: RequestInit
-) => {
+): Promise<T> => {
   try {
     const res = await fetch(url, options);
     return await checkResponse<T>(res);
   } catch (err) {
-    if ((err as { message: string }).message === 'jwt expired') {
-      const refreshData = await refreshToken();
-      if (options.headers) {
-        (options.headers as { [key: string]: string }).authorization =
-          refreshData.accessToken;
+    const error = err as { message: string };
+
+    if (error.message === 'jwt expired' || error.message === 'invalid token') {
+      try {
+        const refreshData = await refreshToken();
+
+        const newOptions = {
+          ...options,
+          headers: {
+            ...options.headers,
+            Authorization: `Bearer ${refreshData.accessToken.split('Bearer ')[1]}`
+          }
+        };
+
+        const res = await fetch(url, newOptions);
+        return await checkResponse<T>(res);
+      } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
+        throw new Error('');
       }
-      const res = await fetch(url, options);
-      return await checkResponse<T>(res);
     } else {
-      return Promise.reject(err);
+      throw err;
     }
   }
 };
@@ -119,6 +131,7 @@ export const orderBurgerApi = (data: string[]) =>
     if (data?.success) return data;
     return Promise.reject(data);
   });
+
 type TOrderResponse = TServerResponse<{
   orders: TOrder[];
 }>;
