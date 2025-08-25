@@ -5,9 +5,9 @@ import { BurgerConstructorUI } from '@ui';
 import { useDispatch, useSelector } from '../../services/store';
 import {
   getOrderBurger,
-  closeOrderModal,
-  setRequest
+  closeOrderModal
 } from '../../services/slices/constructorSlice';
+import { getCookie } from '../../utils/cookie';
 
 export const BurgerConstructor: FC = () => {
   const dispatch = useDispatch();
@@ -41,9 +41,30 @@ export const BurgerConstructor: FC = () => {
   }, [bun, ingredients]);
 
   const handleOrderClick = () => {
-    if (!isAuthenticated) return navigate('/login');
-    if (!bun) return;
-    dispatch(setRequest(true));
+    const token = getCookie('accessToken');
+    console.log('Текущий токен:', token);
+
+    if (!isAuthenticated || !token) {
+      navigate('/login', { state: { from: '/' } });
+      return;
+    }
+
+    if (!bun) {
+      alert('Выберите булку!');
+      return;
+    }
+
+    if (ingredients.length === 0) {
+      alert('Добавьте ингредиенты!');
+      return;
+    }
+
+    const ingredientIds = [
+      bun._id,
+      ...ingredients.map((ing) => ing._id),
+      bun._id
+    ];
+
     dispatch(getOrderBurger(ingredientIds));
   };
 

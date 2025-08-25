@@ -2,7 +2,9 @@ import { setCookie, getCookie, deleteCookie } from './cookie';
 import { TIngredient, TOrder, TOrdersData, TUser } from './types';
 
 //const URL = process.env.BURGER_API_URL;
-const URL = 'https://norma.nomoreparties.space/api';
+//const URL = 'https://norma.nomoreparties.space/api';
+const URL =
+  process.env.BURGER_API_URL || 'https://norma.nomoreparties.space/api';
 
 const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
@@ -31,8 +33,15 @@ export const refreshToken = (): Promise<TRefreshResponse> =>
       if (!refreshData.success) {
         return Promise.reject(refreshData);
       }
-      localStorage.setItem('refreshToken', refreshData.refreshToken);
-      setCookie('accessToken', refreshData.accessToken);
+      if (refreshData.refreshToken) {
+        localStorage.setItem('refreshToken', refreshData.refreshToken);
+      }
+      if (refreshData.accessToken) {
+        const token = refreshData.accessToken.startsWith('Bearer ')
+          ? refreshData.accessToken.split('Bearer ')[1]
+          : refreshData.accessToken;
+        setCookie('accessToken', token);
+      }
       return refreshData;
     });
 
@@ -117,21 +126,33 @@ type TNewOrderResponse = TServerResponse<{
   name: string;
 }>;
 
-export const orderBurgerApi = (data: string[]) =>
-  fetchWithRefresh<TNewOrderResponse>(`${URL}/orders`, {
+export const orderBurgerApi = (data: string[]): Promise<TNewOrderResponse> => {
+  const token = getCookie('accessToken');
+
+  if (!token) {
+    return Promise.reject(new Error('Authentication token missing'));
+  }
+
+  const decodedToken = decodeURIComponent(token);
+
+  return fetchWithRefresh<TNewOrderResponse>(`${URL}/orders`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
-      authorization: getCookie('accessToken')
-    } as HeadersInit,
+      Authorization: decodedToken
+    },
     body: JSON.stringify({
       ingredients: data
     })
-  }).then((data) => {
-    if (data?.success) return data;
-    return Promise.reject(data);
-  });
-
+  })
+    .then((response) => {
+      if (response?.success) return response;
+      return Promise.reject(response);
+    })
+    .catch((error) => {
+      throw error;
+    });
+};
 type TOrderResponse = TServerResponse<{
   orders: TOrder[];
 }>;
@@ -185,7 +206,18 @@ export const loginUserApi = (data: TLoginData) =>
   })
     .then((res) => checkResponse<TAuthResponse>(res))
     .then((data) => {
-      if (data?.success) return data;
+      if (data?.success) {
+        if (data.accessToken) {
+          const token = data.accessToken.replace('Bearer ', '');
+          setCookie('accessToken', token);
+        }
+
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
+
+        return data;
+      }
       return Promise.reject(data);
     });
 
