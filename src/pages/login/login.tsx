@@ -9,7 +9,7 @@ import {
   selectUserError
 } from '../../services/slices/userSlice';
 import { Preloader } from '../../components/ui/preloader';
-import { getCookie } from '../../utils/cookie';
+import { getCookie, setCookie } from '../../utils/cookie';
 
 export const Login: FC = () => {
   const [email, setEmail] = useState('');
@@ -24,6 +24,10 @@ export const Login: FC = () => {
   const error = useSelector(selectUserError);
 
   useEffect(() => {
+    const token = getCookie('accessToken');
+    if (token && !token.startsWith('Bearer ')) {
+      setCookie('accessToken', `Bearer ${token}`);
+    }
     if (user) {
       const from = location.state?.from || '/';
       navigate(from, { replace: true });

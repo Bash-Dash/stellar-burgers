@@ -37,10 +37,7 @@ export const refreshToken = (): Promise<TRefreshResponse> =>
         localStorage.setItem('refreshToken', refreshData.refreshToken);
       }
       if (refreshData.accessToken) {
-        const token = refreshData.accessToken.startsWith('Bearer ')
-          ? refreshData.accessToken.split('Bearer ')[1]
-          : refreshData.accessToken;
-        setCookie('accessToken', token);
+        setCookie('accessToken', refreshData.accessToken);
       }
       return refreshData;
     });
@@ -63,7 +60,7 @@ export const fetchWithRefresh = async <T>(
           ...options,
           headers: {
             ...options.headers,
-            Authorization: `Bearer ${refreshData.accessToken.split('Bearer ')[1]}`
+            Authorization: refreshData.accessToken
           }
         };
 
@@ -133,13 +130,11 @@ export const orderBurgerApi = (data: string[]): Promise<TNewOrderResponse> => {
     return Promise.reject(new Error('Authentication token missing'));
   }
 
-  const decodedToken = decodeURIComponent(token);
-
   return fetchWithRefresh<TNewOrderResponse>(`${URL}/orders`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json;charset=utf-8',
-      Authorization: decodedToken
+      Authorization: token
     },
     body: JSON.stringify({
       ingredients: data

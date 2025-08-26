@@ -7,7 +7,7 @@ import {
   getOrderBurger,
   closeOrderModal
 } from '../../services/slices/constructorSlice';
-import { getCookie } from '../../utils/cookie';
+import { getCookie, setCookie } from '../../utils/cookie';
 
 export const BurgerConstructor: FC = () => {
   const dispatch = useDispatch();
@@ -42,8 +42,10 @@ export const BurgerConstructor: FC = () => {
 
   const handleOrderClick = () => {
     const token = getCookie('accessToken');
-    console.log('Текущий токен:', token);
 
+    if (token && !token.startsWith('Bearer ')) {
+      setCookie('accessToken', `Bearer ${token}`);
+    }
     if (!isAuthenticated || !token) {
       navigate('/login', { state: { from: '/' } });
       return;
