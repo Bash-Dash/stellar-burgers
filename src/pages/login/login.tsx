@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useEffect } from 'react';
 import { LoginUI } from '@ui-pages';
 import { useDispatch, useSelector } from '../../services/store';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -9,11 +9,13 @@ import {
   selectUserError
 } from '../../services/slices/userSlice';
 import { Preloader } from '../../components/ui/preloader';
-import { getCookie, setCookie } from '../../utils/cookie';
+import { useForm } from '../../components/hooks/useForm';
 
 export const Login: FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { values, handleChange } = useForm({
+    email: '',
+    password: ''
+  });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -24,10 +26,6 @@ export const Login: FC = () => {
   const error = useSelector(selectUserError);
 
   useEffect(() => {
-    const token = getCookie('accessToken');
-    if (token && !token.startsWith('Bearer ')) {
-      setCookie('accessToken', `Bearer ${token}`);
-    }
     if (user) {
       const from = location.state?.from || '/';
       navigate(from, { replace: true });
@@ -36,15 +34,13 @@ export const Login: FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!values.email || !values.password) return;
 
     try {
-      const result = await dispatch(loginUser({ email, password })).unwrap();
-      const token = getCookie('accessToken');
+      const result = await dispatch(
+        loginUser({ email: values.email, password: values.password })
+      ).unwrap();
 
-      if (!token) {
-        return;
-      }
       if (result) {
         navigate('/');
       }
@@ -57,10 +53,14 @@ export const Login: FC = () => {
 
   return (
     <LoginUI
-      email={email}
-      setEmail={setEmail}
-      password={password}
-      setPassword={setPassword}
+      email={values.email}
+      setEmail={(value) =>
+        handleChange({ target: { name: 'email', value } } as any)
+      }
+      password={values.password}
+      setPassword={(value) =>
+        handleChange({ target: { name: 'password', value } } as any)
+      }
       handleSubmit={handleSubmit}
       errorText={error || ''}
     />
