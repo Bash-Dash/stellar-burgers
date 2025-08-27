@@ -43,9 +43,6 @@ export const BurgerConstructor: FC = () => {
   const handleOrderClick = () => {
     const token = getCookie('accessToken');
 
-    if (token && !token.startsWith('Bearer ')) {
-      setCookie('accessToken', `Bearer ${token}`);
-    }
     if (!isAuthenticated || !token) {
       navigate('/login', { state: { from: '/' } });
       return;
