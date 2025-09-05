@@ -29,7 +29,7 @@ export const fetchProfileOrders = createAsyncThunk(
   }
 );
 
-const profileOrdersSlice = createSlice({
+export const profileOrdersSlice = createSlice({
   name: 'profileOrders',
   initialState,
   reducers: {

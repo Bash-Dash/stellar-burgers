@@ -1,7 +1,5 @@
-import ingredientsReducer, {
-  fetchIngredients
-} from '../slices/ingredientsSlice';
-import { TIngredient } from '@utils-types';
+import ingredientsReducer, { initialState } from '../slices/ingredientsSlice';
+import { TIngredient } from '../../utils/types';
 
 const mockIngredients: TIngredient[] = [
   {
@@ -20,19 +18,13 @@ const mockIngredients: TIngredient[] = [
 ];
 
 describe('ingredients slice reducer', () => {
-  const initialState = {
-    ingredients: [],
-    isLoading: false,
-    error: null
-  };
-
   it('should return initial state', () => {
     const result = ingredientsReducer(undefined, { type: '' });
     expect(result).toEqual(initialState);
   });
 
   it('should handle fetchIngredients.pending', () => {
-    const action = { type: fetchIngredients.pending.type };
+    const action = { type: 'ingredients/fetchIngredients/pending' };
     const result = ingredientsReducer(initialState, action);
 
     expect(result.isLoading).toBe(true);
@@ -41,7 +33,7 @@ describe('ingredients slice reducer', () => {
 
   it('should handle fetchIngredients.fulfilled', () => {
     const action = {
-      type: fetchIngredients.fulfilled.type,
+      type: 'ingredients/fetchIngredients/fulfilled',
       payload: mockIngredients
     };
     const result = ingredientsReducer(
@@ -57,7 +49,7 @@ describe('ingredients slice reducer', () => {
   it('should handle fetchIngredients.rejected', () => {
     const errorMessage = 'Failed to fetch ingredients';
     const action = {
-      type: fetchIngredients.rejected.type,
+      type: 'ingredients/fetchIngredients/rejected',
       payload: errorMessage
     };
     const result = ingredientsReducer(
