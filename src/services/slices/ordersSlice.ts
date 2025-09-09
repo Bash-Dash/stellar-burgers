@@ -12,7 +12,7 @@ export type TOrdersState = {
   orderModalData: TOrder | null;
 };
 
-const initialState: TOrdersState = {
+export const initialState: TOrdersState = {
   currentOrder: null,
   ordersList: [],
   isLoading: false,
@@ -45,7 +45,7 @@ export const fetchOrderByNumber = createAsyncThunk(
   }
 );
 
-const ordersSlice = createSlice({
+export const ordersSlice = createSlice({
   name: 'orders',
   initialState,
   reducers: {
